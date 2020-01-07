@@ -5,25 +5,15 @@
 ; input: a list L
 ; output: a list containing all numbers in L
 
-(defun foo(x)
-  (format t "foo ~a" x)
-  )
-
-(defun print_list (L)
-  (write L)
-  )
-
 (defun selectnumbers (L)
-  (let nums (list nil))
-  (loop for x in L
-        do (
-          if (numberp x) (append nums (list x)) nil
-          ; TODO append x to nums; ERROR append not working!
-        )
-  )
-  (write nums)
-)
-
+	(if (null L)
+		nil
+		(if (numberp (car L))
+			(append (list (car L)) (selectnumbers (cdr L)))
+			(selectnumbers (cdr L))
+			)
+		)
+	)
 
 ;QUESTION 2 rselect ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; recursively select numbers and create a new list

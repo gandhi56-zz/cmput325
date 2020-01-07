@@ -7,6 +7,13 @@
 		(+ (car list) (sum (cdr list))))
 	)
 
+;; compute length of a list
+(defun len (list)
+	(if (null list)
+		0
+		(+ 1 (len (cdr list)))
+		)
+	)
 
 ;; print list
 (defun print-list (list)
@@ -37,7 +44,6 @@
 
 ;; check if a list is a sublist of another
 (defun sublist (l1 l2)
-	
 	(cond
 		((null l1) t)
 		
@@ -47,31 +53,4 @@
 
 		)
 	)
-
-;; compute length of a list
-(defun len (L)
-	(if (null L)
-		0
-		(+ 1 (len (cdr L)))
-		)
-	)
-
-(defun selectnumbers (L)
-	(if (null L)
-		nil
-		(if (numberp (car L))
-			(append (list (car L)) (selectnumbers (cdr L)))
-			(selectnumbers (cdr L))
-			)
-		)
-	)
-
-
-(defun test-case (ID Test Result)
-	    (if (equal Test Result)
-				        (format t "Test ~S OK~%" ID)
-								        (format t "FAIL: Test ~S expected ~S got ~S~%" ID Result Test)
-												    )
-			)
-
 
