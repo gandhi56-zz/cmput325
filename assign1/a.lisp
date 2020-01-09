@@ -19,14 +19,16 @@
 ; recursively select numbers and create a new list
 
 
-;QUESTION 2 absolute ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+;QUESTION 3 absolute ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; return a list of absolute values of each value in the input list
 
-#||
 (defun absolute (L)
-  (loop for x in L
-    do (  
+  (if (null L)
+    nil
+    (if (>= (car L) 0)
+      (append (list (car L)) (absolute (cdr L)))
+      (append (list (- 0 (car L))) (absolute (cdr L)))
+      )
     )
-  )  
-)
-||#
+  )
+
