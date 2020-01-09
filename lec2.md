@@ -1,6 +1,6 @@
 # CMPUT 325
 
-## Lecture 2
+## Lecture 2: Fun language
 
 - List elements are seperated by a space
 - In general, f( (x1 ... xn) ) --> x, notice the spacing for parameters

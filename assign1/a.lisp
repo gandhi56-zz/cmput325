@@ -32,3 +32,21 @@
     )
   )
 
+;QUESTION 3 courses ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; param:  n, an integer
+;         L, a list of courses in the form of 
+;      ((course-name-1 (s11 s12 ...)) (course-name-2 (s21 s22 ...)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
