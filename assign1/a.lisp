@@ -29,7 +29,10 @@
         )
 
       ; if N[0] is a list
-      (list (append (rselect (car N)) (rselect (cdr N))))
+      (if (null (rselect (car N)))
+        nil
+        (list (append (rselect (car N)) (rselect (cdr N))))
+        )
 
       )
     )
@@ -39,7 +42,7 @@
 ;QUESTION 3 absolute ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; return a list of absolute values of each value in the input list
 
-(defun absolute (L)
+(defun absolutes (L)
   (if (null L)
     nil
     (if (>= (car L) 0)
