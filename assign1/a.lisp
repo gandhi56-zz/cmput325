@@ -18,6 +18,23 @@
 ;QUESTION 2 rselect ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; recursively select numbers and create a new list
 
+(defun rselect (N)
+  (if (null N)
+    nil
+    (if (atom (car N))
+      ; if N[0] is an atom
+      (if (numberp (car N))
+        (append (list (car N)) (rselect (cdr N)))
+        (rselect (cdr N))
+        )
+
+      ; if N[0] is a list
+      (list (append (rselect (car N)) (rselect (cdr N))))
+
+      )
+    )
+  )
+
 
 ;QUESTION 3 absolute ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; return a list of absolute values of each value in the input list
