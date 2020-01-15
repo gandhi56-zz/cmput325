@@ -57,20 +57,25 @@
 ;         L, a list of courses in the form of 
 ;      ((course-name-1 (s11 s12 ...)) (course-name-2 (s21 s22 ...)))
 
-(defun course_count ( x crs )
-  (if (null (car crs))
-    0
-    (if (member x (cdr (car crs)))
-      (+ 1 (course_count x (cdr crs)))
-      (course_count x (cdr crs))
-      )
-    )
-  )
 
+(defun foo ()
+	(if (member 5 (list 1 2 3))
+		"yes"
+		"no"
+		)
+	)
 
-(format t "~a" (course_count 1 '( (c1 (1 2 3)) (c2 (2)) (c3 (1 3))  )))
+(defun crs_cnt (crs i)
+	(if (null crs)
+		0
+		(if (member i (cdr (car crs)))
+			(+ 1 (crs_cnt (cdr crs) i))
+			(crs_cnt (cdr crs) i)
+			)
+		)
+	)
 
-
+;(format t "~a" (crs_cnt (((cmput325 (a b c)) (cmput366 (b a e))) 1)))
 
 
 
