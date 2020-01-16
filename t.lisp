@@ -1,16 +1,14 @@
-(defun c (x)
-  (if (null x)
-    0
-    (if (null (cdr x))
-      0
-      (+ 1 (c (cdr (cdr x))))
-      )
+
+(defun fib(n)
+  (if (<= n 1)
+    1
+    (+ (fib (- n 1)) (fib (- n 2)))
     )
   )
 
+(defun foo ()
+  1
+  )
 
-(defun f (x)
-  (car (car (cdr (car (car (cdr x)))))
-  ))
-
+(write (fib 40))
 
