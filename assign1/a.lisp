@@ -1,4 +1,4 @@
-; Cmput 325 Winter 2020 Assignment 1
+; Cmput 326 Winter 2020 Assignment 1
 ; Student ID 1523205 Student name Anshil Gandhi
 
 ;QUESTION 1 selectnumbers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,26 +58,32 @@
 ;      ((course-name-1 (s11 s12 ...)) (course-name-2 (s21 s22 ...)))
 
 
-(defun foo ()
-	(if (member 5 (list 1 2 3))
-		"yes"
-		"no"
-		)
-	)
-
 (defun crs_cnt (crs i)
-	(if (null crs)
-		0
-		(if (member i (cdr (car crs)))
-			(+ 1 (crs_cnt (cdr crs) i))
-			(crs_cnt (cdr crs) i)
-			)
-		)
-	)
+  (if (null crs)
+    0
+    (if (member i (cadar crs))
+      (+ 1 (crs_cnt (cdr crs) i))
+      (crs_cnt (cdr crs) i)
+      )
+    )
+  )
 
-;(format t "~a" (crs_cnt (((cmput325 (a b c)) (cmput366 (b a e))) 1)))
+(defun get_students (L)
+  (if (null (car L))
+    nil
+    append( (cadar L) (get_students (cdr L)) )
+  )
 
+(defun courses (L)
+  ;(crs_cnt L n)
+  (get_students L)
+  )
 
+#||
+(crs_cnt '( 
+                  (course1 (a b c d)) 
+                  (course2 (a)      ) 
+                  (course3 (b c d) )
+                ) a  )
 
-
-
+||#
