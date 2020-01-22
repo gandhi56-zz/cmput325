@@ -58,32 +58,81 @@
 ;      ((course-name-1 (s11 s12 ...)) (course-name-2 (s21 s22 ...)))
 
 
-(defun crs_cnt (crs i)
-  (if (null crs)
+; good
+(defun crs_cnt (std i)
+  (if (null std)
     0
-    (if (member i (cadar crs))
-      (+ 1 (crs_cnt (cdr crs) i))
-      (crs_cnt (cdr crs) i)
+    (if (eq i (car std))
+      (+ 1 (crs_cnt (cdr std) i))
+      (crs_cnt (cdr std) i)
       )
     )
   )
 
-(defun get_students (L)
-  (if (null (car L))
+; good
+(defun stds (crs)
+  (if (null crs)
     nil
-    append( (cadar L) (get_students (cdr L)) )
-  )
-
-(defun courses (L)
-  ;(crs_cnt L n)
-  (get_students L)
+    (append (cadar crs) (stds (cdr crs)) )
+    )
   )
 
 #||
-(crs_cnt '( 
-                  (course1 (a b c d)) 
-                  (course2 (a)      ) 
-                  (course3 (b c d) )
-                ) a  )
+(defun bruh (n L AC)
+  ;(crs_cnt L n)
+  ;(crs_cnt (stds L) n)
+  ;(stds L)
 
+  (if (null L)
+    AC
+    (if (member (car L) AC)
+      ; if already counted, recurse on the rest of the list
+      (bruh n (cdr L) AC)
+
+      (if (eq n (crs_cnt L (car L)))
+        ; count car L and recurse on the rest of the list
+        (bruh n (cdr L) (append (list (car L)) AC)) 
+
+        ; recurse on the rest of the list
+        (bruh n (cdr L) AC)
+        )
+      )
+    )
+  )
 ||#
+
+
+(defun bruh (n L AC all)
+  (if (null L)
+    AC
+    (if (member (car L) AC)
+      (bruh n (cdr L) AC all)
+      (if (eq n (crs_cnt all (car L)))
+        (bruh n (cdr L) (append AC (list (car L))) all)
+        (bruh n (cdr L) AC all)
+        )
+      )
+    )
+  )
+
+
+
+(defun courses (n L)
+  (bruh n (stds L) nil (stds L))
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
