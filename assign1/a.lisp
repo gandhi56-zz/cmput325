@@ -57,8 +57,6 @@
 ;         L, a list of courses in the form of 
 ;      ((course-name-1 (s11 s12 ...)) (course-name-2 (s21 s22 ...)))
 
-
-; good
 (defun crs_cnt (std i)
   (if (null std)
     0
@@ -69,38 +67,12 @@
     )
   )
 
-; good
 (defun stds (crs)
   (if (null crs)
     nil
     (append (cadar crs) (stds (cdr crs)) )
     )
   )
-
-#||
-(defun bruh (n L AC)
-  ;(crs_cnt L n)
-  ;(crs_cnt (stds L) n)
-  ;(stds L)
-
-  (if (null L)
-    AC
-    (if (member (car L) AC)
-      ; if already counted, recurse on the rest of the list
-      (bruh n (cdr L) AC)
-
-      (if (eq n (crs_cnt L (car L)))
-        ; count car L and recurse on the rest of the list
-        (bruh n (cdr L) (append (list (car L)) AC)) 
-
-        ; recurse on the rest of the list
-        (bruh n (cdr L) AC)
-        )
-      )
-    )
-  )
-||#
-
 
 (defun bruh (n L AC all)
   (if (null L)
@@ -115,18 +87,32 @@
     )
   )
 
-
-
 (defun courses (n L)
   (bruh n (stds L) nil (stds L))
   )
 
+;QUESTION 5 tictactoe ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; check the number of 3 x's in a row, column or diagonal
+; check the number of 3 o's in a row, column or diagonal
+; determine winner or illegal position depending on the number of wins
+; check if there is a blank cell
+; if so, the game is ongoing else the game has ended in a draw
 
+; return r-th row
+(defun get_row (board r)
+  (cond ((eq r 0) (car board))
+        ((eq r 1) (cadr board))
+        ((eq r 2) (caddr board))
+    )
+  )
 
-
-
-
-
+; TODO return c-th column
+(defun get_col (board c)
+  (cond ((eq c 0) (list (caar board) (caadr board) (caaddr board))
+         (eq c 1) (list (second (car board) ) (second (cadr board)) (second (caddr board)))
+         (eq c 2) (list (third  (car board) ) (third  (cadr board)) (third  (caddr board)))
+         ))
+  )
 
 
 
