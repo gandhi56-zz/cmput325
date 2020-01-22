@@ -106,15 +106,33 @@
     )
   )
 
-; TODO return c-th column
+; return c-th column
 (defun get_col (board c)
-  (cond ((eq c 0) (list (caar board) (caadr board) (caaddr board))
-         (eq c 1) (list (second (car board) ) (second (cadr board)) (second (caddr board)))
-         (eq c 2) (list (third  (car board) ) (third  (cadr board)) (third  (caddr board)))
-         ))
+  (cond ((eq c 2) (list (caddar board) (car (cddadr board)) (caddr (caddr board))) )
+        ((eq c 0) (list (caar board) (caadr board) (caaddr board)))
+        ((eq c 1) (list (cadar board) (cadadr board) (car (cdaddr board))))
+        )
   )
 
+; TODO test: return diagonal
+(defun diag (board n)
+  
+  (cond ((eq c 1) (list (caddar board) (cadadr board) (caaddr board)) )
+        ((eq c 0) (list (caar board) (cadadr board) (caddr (caddr board))))
+        )
+  )
 
+; check winner
+(defun check_win (L)
+  (if (and (eq (first L) (second L)) (eq (first L) (third L)) )
+    (first L)
+    "?"
+    )
+  )
+
+(defun tictactoe ()
+  (princ (check_win '(o o o)))
+  )
 
 
 
