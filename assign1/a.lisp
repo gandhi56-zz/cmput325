@@ -100,26 +100,26 @@
 
 ; return r-th row
 (defun get_row (board r)
-  (cond ((eq r 0) (car board))
-        ((eq r 1) (cadr board))
-        ((eq r 2) (caddr board))
+  (cond ((= r 0) (car board))
+        ((= r 1) (cadr board))
+        ((= r 2) (caddr board))
     )
   )
 
 ; return c-th column
 (defun get_col (board c)
   (cond 
-        ((eq c 0) (list (caar board) (caadr board) (caaddr board)))
-        ((eq c 1) (list (cadar board) (cadadr board) (car (cdaddr board))))
-        ((eq c 2) (list (caddar board) (car (cddadr board)) (caddr (caddr board))) )
+        ((= c 0) (list (caar board) (caadr board) (caaddr board)))
+        ((= c 1) (list (cadar board) (cadadr board) (car (cdaddr board))))
+        ((= c 2) (list (caddar board) (car (cddadr board)) (caddr (caddr board))) )
         )
   )
 
 ; return diagonal in a list
 (defun get_diag (board c)
   (cond 
-        ((eq c 0) (list (caar board) (cadadr board) (caddr (caddr board))))
-        ((eq c 1) (list (caaddr board) (cadadr board) (caddar board)))
+        ((= c 0) (list (caar board) (cadadr board) (caddr (caddr board))))
+        ((= c 1) (list (caaddr board) (cadadr board) (caddar board)))
         )
   )
 
@@ -164,16 +164,91 @@
     )
   )
 
+; count the number of triplets containing c
 (defun cnt_wins (board c)
   (+ (cnt_row_wins board 0 c) (cnt_col_wins board 0 c) (cnt_diag_wins board 0 c))
   )
 
-(defun tictactoe ()
-  (princ (cnt_wins '( (x ? x) (o x o) (x x x) ) 'x))
+; check if there is an empty cell
+(defun has_empty (board row)
+  (if (> row 2)
+    nil
+    (if (member '? (get_row board row))
+      T
+      (has_empty board (+ 1 row))
+      )
+    )
   )
 
+; convert board into 1d
+(defun cvt (board)
+  (append (car board) (cadr board) (caddr board) )
+  )
 
+; count the number of c's
+(defun cnt_sym (board c)
+  (crs_cnt (cvt board) c)
+  )
 
+; check if all symbols are valid
+(defun ok_symb (L)
+  (if (null L)
+    T
+    (if (member (car L) '(x o ?))
+      (ok_symb (cdr L))
+      nil
+      )
+    )
+  )
+
+; compute length of a list
+(defun len (L)
+  (if (null L)
+    0
+    (+ 1 (len (cdr L)))
+    )
+  )
+
+; check if board dimensions are valid
+(defun ok_dim (board)
+  (if (= 3 (len board))
+    ; check each row
+    (if  (and (= 3 (len (get_row board 0))) 
+              (= 3 (len (get_row board 1))) 
+              (= 3 (len (get_row board 2)))
+            )
+        T
+        nil
+      )
+      nil
+    )
+  )
+
+; TODO test
+(defun legal_board (board)
+  (if (and (ok_dim board) (ok_symb (cvt board)))
+    T
+    nil
+    )
+  )
+
+(defun tictactoe (board)
+  (if (legal_board board)
+    (if (= 0 (cnt_wins board 'x))
+      (if (= 0 (cnt_wins board 'o))
+        (if (has_empty board 0) "ongoing" "draw"        )
+        (if (legal_board board) "o-win"   "illegal"     )
+        )
+
+      (if (= 0 (cnt_wins board 'o))
+        (if (legal_board board) "x-win"   "illegal"     )
+        "illegal"
+        )
+      )
+    "illegal"
+    )
+  
+  )
 
 
 
