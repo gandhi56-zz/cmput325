@@ -108,17 +108,18 @@
 
 ; return c-th column
 (defun get_col (board c)
-  (cond ((eq c 2) (list (caddar board) (car (cddadr board)) (caddr (caddr board))) )
+  (cond 
         ((eq c 0) (list (caar board) (caadr board) (caaddr board)))
         ((eq c 1) (list (cadar board) (cadadr board) (car (cdaddr board))))
+        ((eq c 2) (list (caddar board) (car (cddadr board)) (caddr (caddr board))) )
         )
   )
 
-; TODO test: return diagonal
-(defun diag (board n)
-  
-  (cond ((eq c 1) (list (caddar board) (cadadr board) (caaddr board)) )
+; return diagonal in a list
+(defun get_diag (board c)
+  (cond 
         ((eq c 0) (list (caar board) (cadadr board) (caddr (caddr board))))
+        ((eq c 1) (list (caaddr board) (cadadr board) (caddar board)))
         )
   )
 
@@ -130,8 +131,45 @@
     )
   )
 
+; count number of wins by a player on rows
+(defun cnt_row_wins (board row c)
+  (if (> row 2)
+    0
+    (if (eq c (check_win (get_row board row)))
+      (+ 1 (cnt_row_wins board (+ row 1) c))
+      (cnt_row_wins board (+ row 1) c)
+      )
+    )
+  )
+
+; count number of wins by a player on cols
+(defun cnt_col_wins (board col c)
+  (if (> col 2)
+    0
+    (if (eq c (check_win (get_col board col)))
+      (+ 1 (cnt_col_wins board (+ col 1) c))
+      (cnt_col_wins board (+ col 1) c)
+      )
+    )
+  )
+
+; count number of wins by a player on cols
+(defun cnt_diag_wins (board diag c)
+  (if (> diag 1)
+    0
+    (if (eq c (check_win (get_diag board diag)))
+      (+ 1 (cnt_diag_wins board (+ diag 1) c))
+      (cnt_diag_wins board (+ diag 1) c)
+      )
+    )
+  )
+
+(defun cnt_wins (board c)
+  (+ (cnt_row_wins board 0 c) (cnt_col_wins board 0 c) (cnt_diag_wins board 0 c))
+  )
+
 (defun tictactoe ()
-  (princ (check_win '(o o o)))
+  (princ (cnt_wins '( (x ? x) (o x o) (x x x) ) 'x))
   )
 
 
