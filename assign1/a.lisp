@@ -224,14 +224,24 @@
     )
   )
 
-; TODO test
+; checks if the board admits a legal position
 (defun legal_board (board)
-  (if (and (ok_dim board) (ok_symb (cvt board)))
+  (if (and  (ok_dim board) 
+            (ok_symb (cvt board)) 
+            (<= (- (cnt_sym board 'x) (cnt_sym board 'o)) 1)
+            (<= (cnt_row_wins board 0 'x) 1)
+            (<= (cnt_row_wins board 0 'o) 1)
+            (<= (cnt_col_wins board 0 'x) 1)
+            (<= (cnt_col_wins board 0 'o) 1)
+            (<= (cnt_diag_wins board 0 'x) 1)
+            (<= (cnt_diag_wins board 0 'o) 1)
+            )
     T
     nil
     )
   )
 
+; main tictactoe driver program
 (defun tictactoe (board)
   (if (legal_board board)
     (if (= 0 (cnt_wins board 'x))
@@ -239,7 +249,6 @@
         (if (has_empty board 0) "ongoing" "draw"        )
         (if (legal_board board) "o-win"   "illegal"     )
         )
-
       (if (= 0 (cnt_wins board 'o))
         (if (legal_board board) "x-win"   "illegal"     )
         "illegal"
@@ -247,9 +256,6 @@
       )
     "illegal"
     )
-  
   )
-
-
 
 
