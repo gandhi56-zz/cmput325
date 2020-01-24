@@ -283,7 +283,38 @@
   )
 
 (defun main ()
+  ; selectnumbers
+  (princ (test-case 1.1 (selectnumbers '()) nil))
+  (princ (test-case 1.2 (selectnumbers '(5)) '(5)))
+  (princ (test-case 1.3 (selectnumbers '(5 9 12)) '(5 9 12)))
+  (princ (test-case 1.4 (selectnumbers '(5 a b)) '(5)))
+  (princ (test-case 1.5 (selectnumbers '(a b c d e)) nil))
+  (princ (test-case 1.6 (selectnumbers '(a 1 (2 3) b 4 c c 5 nil nil 6)) '(1 4 5 6)))
+  (princ (test-case 1.7 (selectnumbers (selectnumbers '(5 a 6))) '(5 6)))
+  (princ (test-case 1.8 (selectnumbers '(a b 1 2 (c d 3 4))) '(1 2)))
+  (princ (test-case 1.9 (selectnumbers '((5))) nil))
 
+  ; rselect
+  (princ (test-case 2.1 (rselect '()) nil))
+  (princ (test-case 2.2 (rselect '(5 a b 6 c)) '(5 6)))
+  (princ (test-case 2.3 (rselect '(a b 1 2 (c d 3 4))) '(1 2 (3 4))))
+  (princ (test-case 2.4 (rselect '((5))) '((5))))
+  (princ (test-case 2.5 (rselect '(a b (c d))) nil))
+  (princ (test-case 2.6 (rselect '(a b (c (d e) f))) nil))
+  (princ (test-case 2.7 (rselect '((()((()()))))) nil))
+  (princ (test-case 2.8 (rselect '((()((()(2)))))) '(((((2)))))))
+
+  ; absolutes
+  (princ (test-case 3.1 (absolutes '(1 -2 3 -4 5 -6)) '(1 2 3 4 5 6)))
+  (princ (test-case 3.2 (absolutes '(1 0 -1)) '(1 0 1)))
+  (princ (test-case 3.3 (absolutes nil) nil))
+
+  ; courses
+  (princ (test-case 4.1 (courses 1 '((cmput325 (a b c)) (cmput366 (b a e)))) '(c e)))
+  (princ (test-case 4.2 (courses 2 '((cmput325 (a b c)) (cmput366 (b a e)))) '(a b)))
+  (princ (test-case 4.3 (courses 3 '((cmput325 (a b c)) (cmput366 (b a e)))) nil))
+
+  ; tictactoe
   (princ (test-case 5.1 (tictactoe nil) 'illegal))
   (princ (test-case 5.2 (tictactoe '(tic tac toe)) 'illegal))
   (princ (test-case 5.3 (tictactoe 'tictactoe) 'illegal))
