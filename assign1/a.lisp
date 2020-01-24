@@ -211,16 +211,26 @@
 
 ; check if board dimensions are valid
 (defun ok_dim (board)
-  (if (= 3 (len board))
-    ; check each row
-    (if  (and (= 3 (len (get_row board 0))) 
-              (= 3 (len (get_row board 1))) 
-              (= 3 (len (get_row board 2)))
-            )
-        T
+  (if (atom board)
+    nil
+    ;
+    (if (= 3 (len board))
+      ; check each row
+      (if (or (atom (car board))
+               (atom (cadr board))
+               (atom (caddr board)))
+        nil 
+        
+        (if  (and (= 3 (len (get_row board 0))) 
+                  (= 3 (len (get_row board 1))) 
+                  (= 3 (len (get_row board 2)))
+                )
+            T
+            nil
+          )
+        )
         nil
       )
-      nil
     )
   )
 
@@ -245,17 +255,63 @@
 (defun tictactoe (board)
   (if (legal_board board)
     (if (= 0 (cnt_wins board 'x))
+      ; if x does not have a triple
       (if (= 0 (cnt_wins board 'o))
-        (if (has_empty board 0) "ongoing" "draw"        )
-        (if (legal_board board) "o-win"   "illegal"     )
+        (if (has_empty board 0)                         'ongoing  'draw         )
+        (if (= (cnt_sym board 'x) (cnt_sym board 'o) ) 'o-win    'illegal      )
         )
+      
+      ; if x has at least 1 triple TODO : can x have 2 or more than 2 triples here?
       (if (= 0 (cnt_wins board 'o))
-        (if (legal_board board) "x-win"   "illegal"     )
-        "illegal"
+
+        ; x must occupy exactly one more than the number of o's
+        (if (= (cnt_sym board 'x) (+ 1 (cnt_sym board 'o)) ) 'x-win    'illegal      )
+        
+        ; o cannot win if x has already won
+        'illegal
         )
       )
-    "illegal"
+    'illegal
     )
   )
+
+(defun test-case (ID Test Result)
+  (if (equal Test Result)
+    (format t "Test ~S OK~%" ID)
+    (format t "FAIL: Test ~S expected ~S got ~S~%" ID Result Test)
+    )
+  )
+
+(defun main ()
+
+  (princ (test-case 5.1 (tictactoe nil) 'illegal))
+  (princ (test-case 5.2 (tictactoe '(tic tac toe)) 'illegal))
+  (princ (test-case 5.3 (tictactoe 'tictactoe) 'illegal))
+  (princ (test-case 5.4 (tictactoe '((? ? ?)(? ? ?)(? ? ? ?))) 'illegal))
+  (princ (test-case 5.5 (tictactoe '((? ? ?)(? ? ?)(? ? ?)(? ? ?))) 'illegal))
+  (princ (test-case 5.6 (tictactoe '((? ? ?)(? ? ?))) 'illegal))
+  (princ (test-case 5.7 (tictactoe '((x ? ?)(x ? ?)(x ? ?))) 'illegal))
+  (princ (test-case 5.8 (tictactoe '((x x x)(o o ?)(? ? ?))) 'x-win))
+  (princ (test-case 5.9 (tictactoe '((x ? o)(x ? ?)(x o ?))) 'x-win))
+  (princ (test-case 5.10 (tictactoe '((x o x)(o x ?)(x ? o))) 'x-win))
+  (princ (test-case 5.11 (tictactoe '((x ? o)
+                                      (x o ?)
+                                      (x o ?))) 'illegal))
+  (princ (test-case 5.12 (tictactoe '((x o ?)(x o ?)(x o ?))) 'illegal))
+  (princ (test-case 5.13 (tictactoe '((x x ?)(o o o)(x ? ?))) 'o-win))
+  (princ (test-case 5.14 (tictactoe '((o x ?)(? o x)(? x o))) 'o-win))
+  (princ (test-case 5.15 (tictactoe '((o x ?)(? o x)(? ? o))) 'illegal))
+  (princ (test-case 5.16 (tictactoe '((x x x)(o o o)(? ? ?))) 'illegal))
+  (princ (test-case 5.17 (tictactoe '((x x x)(x o o)(? ? ?))) 'illegal))
+  (princ (test-case 5.18 (tictactoe '((? ? ?)(? ? ?)(? ? ?))) 'ongoing))
+  (princ (test-case 5.19 (tictactoe '((? ? ?)(? x ?)(? ? ?))) 'ongoing))
+  (princ (test-case 5.20 (tictactoe '((? ? o)(? x ?)(? ? ?))) 'ongoing))
+  (princ (test-case 5.21 (tictactoe '((? x o)(? x ?)(? ? ?))) 'ongoing))
+  (princ (test-case 5.22 (tictactoe '((x x o)(o o x)(x x o))) 'draw))
+  (princ (test-case 5.23 (tictactoe '((x o o)(o x x)(x x o))) 'draw))
+)
+
+
+
 
 
