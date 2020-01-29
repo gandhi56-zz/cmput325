@@ -172,8 +172,8 @@
             (<= (cnt_row_wins board 0 'o) 1)
             (<= (cnt_col_wins board 0 'x) 1)
             (<= (cnt_col_wins board 0 'o) 1)
-            (<= (cnt_diag_wins board 0 'x) 1)
-            (<= (cnt_diag_wins board 0 'o) 1)
+            (<= (cnt_diag_wins board 0 'x) 2)
+            (<= (cnt_diag_wins board 0 'o) 2)
             )
     T
     nil

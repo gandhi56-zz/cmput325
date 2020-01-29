@@ -245,8 +245,8 @@
             (<= (cnt_row_wins board 0 'o) 1)
             (<= (cnt_col_wins board 0 'x) 1)
             (<= (cnt_col_wins board 0 'o) 1)
-            (<= (cnt_diag_wins board 0 'x) 1)
-            (<= (cnt_diag_wins board 0 'o) 1)
+            (<= (cnt_diag_wins board 0 'x) 2)
+            (<= (cnt_diag_wins board 0 'o) 2)
             )
     T
     nil
@@ -384,7 +384,7 @@
   ;;; most cells are filled
   (princ (test-case 5.45 (tictactoe '((x o x)
                                       (o x o)
-                                      (x o x))) 'illegal))
+                                      (x o x))) 'x-win))
   (princ (test-case 5.46 (tictactoe '((x o x)
                                       (o x o)
                                       (x o ?))) 'illegal))
@@ -408,6 +408,17 @@
   
   (princ (test-case 4.5 (courses 1 '((c1 (a b c)) (c2 (d e f)) (c3 (g h i)) (c4 (j)) (c5 (k)) (c6 ()) )) '(a b c d e f g h i j k)))
   (princ (test-case 4.6 (courses 2 '((c1 (a b c)) (c2 (d e f)) (c3 (g h i)) (c4 (j)) (c5 (k)) (c6 ()) )) '()))
+
+  (princ (test-case 5.52 (tictactoe '((x x x)
+                                      (x o o)
+                                      (x o o))) 'x-win))
+
+
+
+  (princ (test-case 5.53 (tictactoe '((o o o)
+                                      (o x x)
+                                      (o x x))) 'illegal))
+
 )
 
 
