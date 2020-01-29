@@ -10,7 +10,7 @@
 
 ; checks if E is a fraction
 (defun isFrac (E)
-  (if (and (numberp (car E)) (numberp (cdr E)) )
+  (if (and (integerp (car E)) (integerp (cdr E)) )
     t
     nil
     )
@@ -112,7 +112,7 @@
   )
 
 (defun sbin(E)
-  (cond ( (numberp E)   (intToFrac E)                           )
+  (cond ( (integerp E)   (intToFrac E)                           )
         ( (isFrac E )   (sfHelper E (euclid (car E) (cdr E)))   )
         ( t  (evaluate (op E) (sbin (car E)) (simplifyBinary (caddr E)) ))
         )
