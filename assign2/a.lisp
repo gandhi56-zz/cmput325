@@ -1,4 +1,7 @@
 
+; Cmput 326 Winter 2020 Assignment 1
+; Student ID 1523205 Student name Anshil Gandhi
+
 ; computes gcd(x, y)
 (defun euclid (x y)
   (cond ((and (= x 0) (= y 0))  'GCD-ERROR        )
@@ -159,9 +162,35 @@
     )
   )
 
+; ------------------------------------------------------------------
+
+(defun is_op (op)
+  (if (or (eq op '+) (eq op '-) (eq op '*) (eq op '/))
+    t
+    nil
+    )
+  )
+
+; input an infix expression E and an operation op
+; returns an infix expression with E modified in a way
+; such that the leftmost op and its operands are
+; put inside of brackets
+;
+; if the first character is not an operation, then
+; apply this function on the rest of E from the next character
+;; (defun leftmost_op (E op)
+;;   (if (eq (car E) op)
+
+    
+
+;;     (cons (car E) (leftmost_op (cdr E) op))
+;;     )
+;;   )
+
 ; given an infix expression E, return the binary expression
 ; - no simplification
 ; - no error checking
+; infix expression: (a0 op0 a1 op1 a2 ... opn an+1)
 (defun binarize (E)
   nil
   )
