@@ -6,7 +6,7 @@
         (t                  ( euclid y (mod x y)) )
         )
   )
-; -----------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 ; checks if E is a fraction
 (defun isFrac (E)
@@ -15,7 +15,7 @@
     nil
     )
   )
-; -----------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 ; converts fraction to integer if possible
 (defun fracToInt (F)
@@ -24,13 +24,13 @@
     F
     )
   )
-; -----------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 ; converts integer to fraction
 (defun intToFrac (N)
   (cons N 1)
   )
-; -----------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 ; divides numerator and denominator by their gcd
 (defun sfHelper (F d)
@@ -43,7 +43,7 @@
     (fracToInt (sfHelper F (euclid (car F) (cdr F))))
     )
   )
-; -----------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 ; ===================================
 ; || Binary expression evaluation  ||
@@ -88,7 +88,12 @@
 
 ; evaluate when l and r are known fractions
 (defun evaluate (op l r)
-  (cond ( (eq '+ op)
+  (cond 
+        ((or (eq l 'ZERODIVIDE-ERROR) (eq r 'ZERODIVIDE-ERROR))
+          'ZERODIVIDE-ERROR
+          )
+  
+        ( (eq '+ op)
          (if (bad_denom l r)  'ZERODIVIDE-ERROR
             (sfHelper (addFrac l r) (euclid (car (addFrac l r)) (cdr (addFrac l r)) ) )
             )
@@ -111,44 +116,71 @@
         )
   )
 
+; checks if E already contains an error
+(defun badExpr (E)
+  (if (atom E)
+    (if (eq E 'ZERODIVIDE-ERROR)
+      t
+      nil
+      )
+
+    (if (or (eq (first E) 'ZERODIVIDE-ERROR) (eq (third E) 'ZERODIVIDE-ERROR) )
+      t
+      nil
+      )
+    )
+  )
+
+; recursive evaluation of binary expression
+; if E is an integer, then returns its equivalent fraction
+; if E is a fraction, then reduce and return the fraction
+; otherwise, evaluate the binary expression
 (defun sbin(E)
-  (cond ( (integerp E)   (intToFrac E)                           )
+  (cond
+        ( (integerp E)   (intToFrac E)                           )
         ( (isFrac E )   (sfHelper E (euclid (car E) (cdr E)))   )
-        ( t  (evaluate (op E) (sbin (car E)) (simplifyBinary (caddr E)) ))
-        )
+        ( t (evaluateExpr E))
+      )
   )
 
-; TODO convert into int, test
+; evaluate binary expression, helper for sbin
+(defun evaluateExpr (E)
+  (if (badExpr E)
+    'ZERODIVIDE-ERROR
+    (evaluate (op E) (sbin (car E)) (sbin (caddr E)))
+    )
+  )
+
+; main driver function for binary expression evaluation
 (defun simplifyBinary (E)
-  (sbin E)
+  (if (eq 'ZERODIVIDE-ERROR (sbin E))
+    'ZERODIVIDE-ERROR
+    (simplifyFraction (sbin E))
+    )
   )
 
-; -----------------------------------------------------------------------------------------------------
+; given an infix expression E, return the binary expression
+; - no simplification
+; - no error checking
+(defun binarize (E)
+  nil
+  )
+
+; ------------------------------------------------------------------
+(defun test-case (ID Test Result)
+    (if (equal Test Result)
+        (format t "Test ~S OK~%" ID)
+        (format t "FAIL: Test ~S expected ~S got ~S~%" ID Result Test)
+    )
+  )
+
+
+
+; ------------------------------------------------------------------
+
+
 
 ; Main driver
-(defun main()
-  (simplifyBinary '((2 + 3) * (6 + 1)))
+(defun main ()
+  nil
   )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
