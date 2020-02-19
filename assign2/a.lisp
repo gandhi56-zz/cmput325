@@ -142,16 +142,13 @@
   (cond
         ( (integerp E)   (intToFrac E)                           )
         ( (isFrac E )   (sfHelper E (euclid (car E) (cdr E)))   )
-        ( t (evaluateExpr E))
+        ( t  
+          (if (badExpr E)
+            'ZERODIVIDE-ERROR
+            (evaluate (op E) (sbin (car E)) (sbin (caddr E)))
+            ) 
+          )
       )
-  )
-
-; evaluate binary expression, helper for sbin
-(defun evaluateExpr (E)
-  (if (badExpr E)
-    'ZERODIVIDE-ERROR
-    (evaluate (op E) (sbin (car E)) (sbin (caddr E)))
-    )
   )
 
 ; main driver function for binary expression evaluation
@@ -164,8 +161,15 @@
 
 ; ------------------------------------------------------------------
 
-(defun is_op (op)
-  (if (or (eq op '+) (eq op '-) (eq op '*) (eq op '/))
+(defun big_op (op)
+  (if (or (eq op '*) (eq op '/))
+    t
+    nil
+    )
+  )
+
+(defun small_op (op)
+  (if (or (eq op '+) (eq op '-))
     t
     nil
     )
@@ -178,22 +182,24 @@
 ;
 ; if the first character is not an operation, then
 ; apply this function on the rest of E from the next character
-;; (defun leftmost_op (E op)
-;;   (if (eq (car E) op)
-
-    
-
-;;     (cons (car E) (leftmost_op (cdr E) op))
-;;     )
-;;   )
+(defun leftmost_op (E)
+  (if (null E)
+    nil
+    (if (big_op (cadr E))
+      ;; (cons (list (car E) (caddr E)) (leftmost_op (cdddr) ) )
+      (leftmost_op (append (list (list (car E) (cadr E) (caddr E))) (cdddr E) ))
+      (append (list (car E) (cadr E)) (leftmost_op (cddr E )) )
+      )
+    )
+  )
 
 ; given an infix expression E, return the binary expression
 ; - no simplification
 ; - no error checking
 ; infix expression: (a0 op0 a1 op1 a2 ... opn an+1)
-(defun binarize (E)
-  nil
-  )
+;; (defun binarize (E)
+;;   nil
+;;   )
 
 ; ------------------------------------------------------------------
 (defun test-case (ID Test Result)
@@ -211,5 +217,5 @@
 
 ; Main driver
 (defun main ()
-  nil
+  (leftmost_op '(3 * 5 + 2 * 1))
   )
