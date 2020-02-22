@@ -21,27 +21,19 @@
 
 ; converts fraction to integer if possible
 (defun fracToInt (F)
-  (if (= (cdr F) 1)
-    (car F)
-    F
-    )
+  (if (= (cdr F) 1) (car F) F )
   )
 ; ------------------------------------------------------------------
 
 ; converts integer to fraction
-(defun intToFrac (N)
-  (cons N 1)
-  )
+(defun intToFrac (N)  (cons N 1)  )
 ; ------------------------------------------------------------------
 
 ; divides numerator and denominator by their gcd
-(defun sfHelper (F d)
-  (cons (/ (car F) d) (/ (cdr F) d) )
-  )
+(defun sfHelper (F d) (cons (/ (car F) d) (/ (cdr F) d) ) )
 
 (defun simplifyFraction (F)
-  (if (= (cdr F) 0)
-    'ZERODIVIDE-ERROR
+  (if (= (cdr F) 0) 'ZERODIVIDE-ERROR
     (fracToInt (sfHelper F (euclid (car F) (cdr F))))
     )
   )
@@ -78,9 +70,7 @@
   )
 
 ; divide fractions
-(defun divFrac (l r)
-  (mulFrac l (inv r))
-  )
+(defun divFrac (l r)  (mulFrac l (inv r)) )
 
 ; checks for divide by zero error 
 ; for +, -, * on two binary expressions
@@ -121,11 +111,7 @@
 ; checks if E already contains an error
 (defun badExpr (E)
   (if (atom E)
-    (if (eq E 'ZERODIVIDE-ERROR)
-      t
-      nil
-      )
-
+    (if (eq E 'ZERODIVIDE-ERROR)  t nil )
     (if (or (eq (first E) 'ZERODIVIDE-ERROR) (eq (third E) 'ZERODIVIDE-ERROR) )
       t
       nil
@@ -142,8 +128,7 @@
         ( (integerp E)   (intToFrac E)                           )
         ( (isFrac E )   (sfHelper E (euclid (car E) (cdr E)))   )
         ( t  
-          (if (badExpr E)
-            'ZERODIVIDE-ERROR
+          (if (badExpr E) 'ZERODIVIDE-ERROR
             (evaluate (op E) (sbin (car E)) (sbin (caddr E)))
             ) 
           )
@@ -152,86 +137,54 @@
 
 ; main driver function for binary expression evaluation
 (defun simplifyBinary (E)
-  (if (eq 'ZERODIVIDE-ERROR (sbin E))
-    'ZERODIVIDE-ERROR
+  (if (eq 'ZERODIVIDE-ERROR (sbin E)) 'ZERODIVIDE-ERROR
     (simplifyFraction (sbin E))
     )
   )
 
 ; ------------------------------------------------------------------
 
-(defun big_op (op)
-  (if (or (eq op '*) (eq op '/))
-    t
-    nil
-    )
-  )
+;; operator getters and identifiers
+(defun big_op (op)      (if (or (eq op '*) (eq op '/))      t nil ) )
+(defun small_op (op)    (if (or (eq op '+) (eq op '-))      t nil ) )
+(defun is_op (op)       (if (or (big_op op) (small_op op))  t nil ) )
+(defun leftmost_op (E)  (if (is_op (first E)) (first E) (second E)) )
+(defun get_op1 (E)                                  (leftmost_op E) )
+(defun get_op2 (E)                          (leftmost_op (cddr E))  )
 
-(defun small_op (op)
-  (if (or (eq op '+) (eq op '-))
-    t
-    nil
-    )
-  )
-
-(defun is_op (op)
-  (if (or (eq op '+) (eq op '-) (eq op '*) (eq op '/))
-    t
-    nil
-    )
-  )
-
-(defun leftmost_op (E)
-  (if (is_op (first E))
-    (first E)
-    (second E)
-    )
-  )
-
-(defun get_op1 (E)
-  (leftmost_op E)
-  )
-
-(defun get_op2 (E)
-  (leftmost_op (cddr E))
-  )
-
-(defun case2_cond (op1 op2)
-  (if (and (small_op op1) (big_op op2))
-    t
-    nil
-    )
-  )
-
+;; converts an infix expression
+;; to binary expression
 (defun binarize (E)
-  (if (or (atom E) (isFrac E))  ;; atom or numberp???
-    E
+  (if (or (atom E) (isFrac E))  E
     (cond
-    ( (and (null (get_op1 E)) (null (get_op2 E)) )
-        E  )    ; E is a number
-    ( (null (get_op2 E))        
-        (list (binarize (first E)) (second E) (binarize (third E)))  )    ; E is already a binary expression
-    ( t 
-        (if (case2_cond (get_op1 E) (get_op2 E))
-            ; case 2
-            (binarize (append (list 
-                      (binarize (first E)) 
-                      (second E) 
-                      (list (binarize (third E)) (fourth E) (binarize (car (cddddr E))))
-                    ) 
-                    (cdr (cddddr E)) 
-                ) 
-              )
+      ; E is a number
+      ( (and (null (get_op1 E)) (null (get_op2 E)) )  E  )
+      
+      ; E is already a binary expression
+      ( (null (get_op2 E))  (list (binarize (first E)) (second E) (binarize (third E)))  )
 
-            ; case 1
-            (binarize (append (list 
-                      (list (binarize (first E)) (second E) (binarize (third E)))) 
-                      (cdddr E)
+
+      ( t 
+          (if (and (small_op (get_op1 E)) (big_op (get_op2 E)))
+              ; case 2
+              (binarize (append (list 
+                        (binarize (first E)) 
+                        (second E) 
+                        (list (binarize (third E)) (fourth E) (binarize (car (cddddr E))))
+                      ) 
+                      (cdr (cddddr E)) 
+                  ) 
                 )
-              )
-          )
+
+              ; case 1
+              (binarize (append (list 
+                        (list (binarize (first E)) (second E) (binarize (third E)))) 
+                        (cdddr E)
+                  )
+                )
+            )
+        )
       )
-    )
 
     )
   )
@@ -241,6 +194,8 @@
 ;; arithmetic
 (defun simplify (E) (simplifyBinary (binarize E)) )
 
+;; if var is a constant return it
+;; otherwise search for var in bindings
 (defun getValue (bindings var)
   (cond
     ( (is_op var)  var)
@@ -257,17 +212,16 @@
     )
   )
 
+;; recursive substitution of E with 
+;; variables defined in bindings
+;; store answer in AC
 (defun subVar (bindings E AC)
   (if (null E)
     AC
     (cond
-
-      ; if E is an atom
-      ( (atom E)
-        ; if E is a number or an operator then push it into AC
-        ; if E is a variable then query its value from AC
-        (getValue bindings E)
-        )
+      ; if E is a number or an operator then push it into AC
+      ; if E is a variable then query its value from AC
+      ( (atom E)  (getValue bindings E) )
 
       ; if E is a list
       (t
@@ -276,15 +230,13 @@
           (subVar bindings (cdr E) (append AC (list (subVar bindings (car E) nil) )) )
           )
         )
-      
       )
-
     )
   )
 
 ;; Bindings = ( (x1 I1) (x2 I2) ... (xn In) )
 ;; E is a varexpr
-;; apply simplify to each Ik
+;; return an infix expression
 (defun substitutevar (Bindings E) 
   (subVar Bindings E nil)
   )
@@ -305,11 +257,6 @@
 ; ------------------------------------------------------------------
 ; Main driver
 (defun main ()
-
-  ;; (substitutevar '( (x 1) (y 2) ) '(x + y))
-
-  ;; (binarize '((0 + 0 * 0) * 0 * (0 + (0 * 0 * 0 * 0 * 0))))
-  ;; (binarize '(0 + (0 + 0 * 0 * 0)))
 
   ; simplifybinary
   (test-case "3.19" (simplifybinary '(0 * 0)) 0)
@@ -421,7 +368,7 @@
 
 
   ;; binarize
-  (princ (test-case "4.13"
+  (test-case "4.13"
             (binarize
               '(0 * 0 * (0 * 0) * (0 * 0 * (0 * 0)) * (0 * 0 * (0 * 0) * (0 * 0 * (0 * 0))) *
                 (0 * 0 * (0 * 0) * (0 * 0 * (0 * 0)) * (0 * 0 * (0 * 0) * (0 * 0 * (0 * 0))))
@@ -440,7 +387,7 @@
                 *
                 ((((0 * 0) * (0 * 0)) * ((0 * 0) * (0 * 0))) *
                 (((0 * 0) * (0 * 0)) * ((0 * 0) * (0 * 0))))))
-            ))
+            )
   (test-case "4.14"
             (binarize
               '(0 / 0 / (0 / 0) / (0 / 0 / (0 / 0)) / (0 / 0 / (0 / 0) / (0 / 0 / (0 / 0))) /
