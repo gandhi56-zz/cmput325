@@ -243,11 +243,17 @@
 (defun simplify (E) (simplifyBinary (binarize E)) )
 
 (defun getValue (bindings var)
-  (if (null bindings)
-    'ERROR  ; var does not exist in bindings
-    (if (eq (caar bindings) var)
-      (simplify (cadar bindings))
-      (getValue (cdr bindings) var)
+  (cond
+    ( (is_op var)  var)
+    ( (numberp var) var)
+    (t
+      (if (null bindings)
+        'ERROR  ; var does not exist in bindings
+        (if (eq (caar bindings) var)
+          (simplify (cadar bindings))
+          (getValue (cdr bindings) var)
+          )
+        )
       )
     )
   )
@@ -255,23 +261,21 @@
 (defun subVar (bindings E AC)
   (if (null E)
     AC
-
     (cond
 
-      ; if car E is an operator or a value append it into AC
-      ( (or (is_op (car E)) (numberp (car E)) ) 
-        (subVar bindings (cdr E) (append AC (list (car E))))
+      ; if E is an atom
+      ( (atom E)
+        ; if E is a number or an operator then push it into AC
+        ; if E is a variable then query its value from AC
+        (getValue bindings E)
         )
 
-      ; recurse if car E is a list
-      ( (list (car E))  
-        (subVar 
-          bindings (cdr E) (append AC (list (subVar bindings (car E) nil))) ) 
-        )
-      
-      ; if car E is a variable
-      (t 
-        (subVar bindings (cdr E) (append AC (list (getValue bindings (car E)))))
+      ; if E is a list
+      (t
+        (if (isFrac E)
+          E
+          (subVar bindings (cdr E) (append AC (list (subVar bindings (car E) nil) )) )
+          )
         )
       
       )
@@ -308,6 +312,8 @@
 
 ; Main driver
 (defun main ()
+
+  (substitutevar '( (x 1) (y 2) ) '(x + y))
 
   ;; (binarize '((0 + 0 * 0) * 0 * (0 + (0 * 0 * 0 * 0 * 0))))
   ;; (binarize '(0 + (0 + 0 * 0 * 0)))
@@ -652,40 +658,40 @@
               '((a 1) (b 1) (c 1) (d 1) (e 1) (f 1) (g 1) (h 1) (i 1) (j 1) (k 1) (l 1) (m 1) (n 1) (o 1) (p 1) (q 1) (r 1) (s 1) (t 1) (u 1) (v 1) (w 1) (x 1) (y 1) (z 1))
               '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
              '(1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1))
-  ;; (test-case "6.12"
-  ;;            (substitutevar
-  ;;             '((a 2) (b 2) (c 2) (d 2) (e 2) (f 2) (g 2) (h 2) (i 2) (j 2) (k 2) (l 2) (m 2) (n 2) (o 2) (p 2) (q 2) (r 2) (s 2) (t 2) (u 2) (v 2) (w 2) (x 2) (y 2) (z 2))
-  ;;             '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
-  ;;            '(2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2))
-  ;; (test-case "6.13"
-  ;;            (substitutevar
-  ;;             '((a (2 . 3)) (b (2 . 3)) (c (2 . 3)) (d (2 . 3)) (e (2 . 3)) (f (2 . 3)) (g (2 . 3)) (h (2 . 3)) (i (2 . 3)) (j (2 . 3)) (k (2 . 3)) (l (2 . 3)) (m (2 . 3)) (n (2 . 3)) (o (2 . 3)) (p (2 . 3)) (q (2 . 3)) (r (2 . 3)) (s (2 . 3)) (t (2 . 3)) (u (2 . 3)) (v (2 . 3)) (w (2 . 3)) (x (2 . 3)) (y (2 . 3)) (z (2 . 3)))
-  ;;             '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
-  ;;            '((2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3)))
-  ;; (test-case "6.14"
-  ;;            (substitutevar
-  ;;             '((a 1) (b 2) (c 3) (d 4) (e 5) (f 6) (g 7) (h 8) (i 9) (j 10) (k 11) (l 12) (m 13) (n 14) (o 15) (p 16) (q 17) (r 18) (s 19) (t 20) (u 21) (v 22) (w 23) (x 24) (y 25) (z 26))
-  ;;             '(a + b - c * d / e + f - g * h / i + j - k * l / m + n - o * p / q + r - s * t / u + v - w * x / y + z))
-  ;;            '(1 + 2 - 3 * 4 / 5 + 6 - 7 * 8 / 9 + 10 - 11 * 12 / 13 + 14 - 15 * 16 / 17 + 18 - 19 * 20 / 21 + 22 - 23 * 24 / 25 + 26))
-  ;; (test-case "6.15"
-  ;;            (substitutevar
-  ;;             '((z 26) (y 25) (x 24) (w 23) (v 22) (u 21) (t 20) (s 19) (r 18) (q 17) (p 16)
-  ;;               (o 15) (n 14) (m 13) (l 12) (k 11) (j 10) (i 9) (h 8) (g 7) (f 6) (e 5) (d 4)
-  ;;               (c 3) (b 2) (a 1))
-  ;;             '(a + b - c * d / e + f - g * h / i + j - k * l / m + n - o * p / q + r - s * t / u + v - w * x / y + z))
-  ;;            '(1 + 2 - 3 * 4 / 5 + 6 - 7 * 8 / 9 + 10 - 11 * 12 / 13 + 14 - 15 * 16 / 17 + 18 - 19 * 20 / 21 + 22 - 23 * 24 / 25 + 26))
-  ;; (test-case "6.16"
-  ;;            (substitutevar
-  ;;             '((z 26) (y 25) (x 24) (w 23) (v 22) (u 21) (t 20) (s 19) (r 18) (q 17) (p 16)
-  ;;               (o 15) (n 14) (m 13) (l 12) (k 11) (j 10) (i 9) (h 8) (g 7) (f 6) (e 5) (d 4)
-  ;;               (c 3) (b 2) (a 1))
-  ;;             '(a + a - a * a / a + a - a * a / a + a - a * a / a + a - a * a / a + a - a * a / a + a - a * a / a + a))
-  ;;            '(1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1))
-  ;; (test-case "6.17"
-  ;;            (substitutevar
-  ;;             '((a 1) (b 2) (c 3) (d 4) (e 5) (f 6) (g 7) (h 8) (i 9) (j 10) (k 11) (l 12) (m 13) (n 14) (o 15) (p 16) (q 17) (r 18) (s 19) (t 20) (u 21) (v 22) (w 23) (x 24) (y 25) (z 26))
-  ;;             '(a + (b - (c * (d / (e + (f - (g * (h / (i + (j - (k * (l / (m + (n - (o * (p / (q + (r - (s * (t / (u + (v - (w * (x / (y + z))))))))))))))))))))))))))
-  ;;            '(1 + (2 - (3 * (4 / (5 + (6 - (7 * (8 / (9 + (10 - (11 * (12 / (13 + (14 - (15 * (16 / (17 + (18 - (19 * (20 / (21 + (22 - (23 * (24 / (25 + 26))))))))))))))))))))))))))
+  (test-case "6.12"
+             (substitutevar
+              '((a 2) (b 2) (c 2) (d 2) (e 2) (f 2) (g 2) (h 2) (i 2) (j 2) (k 2) (l 2) (m 2) (n 2) (o 2) (p 2) (q 2) (r 2) (s 2) (t 2) (u 2) (v 2) (w 2) (x 2) (y 2) (z 2))
+              '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+             '(2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2))
+  (test-case "6.13"
+             (substitutevar
+              '((a (2 . 3)) (b (2 . 3)) (c (2 . 3)) (d (2 . 3)) (e (2 . 3)) (f (2 . 3)) (g (2 . 3)) (h (2 . 3)) (i (2 . 3)) (j (2 . 3)) (k (2 . 3)) (l (2 . 3)) (m (2 . 3)) (n (2 . 3)) (o (2 . 3)) (p (2 . 3)) (q (2 . 3)) (r (2 . 3)) (s (2 . 3)) (t (2 . 3)) (u (2 . 3)) (v (2 . 3)) (w (2 . 3)) (x (2 . 3)) (y (2 . 3)) (z (2 . 3)))
+              '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+             '((2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3) + (2 . 3)))
+  (test-case "6.14"
+             (substitutevar
+              '((a 1) (b 2) (c 3) (d 4) (e 5) (f 6) (g 7) (h 8) (i 9) (j 10) (k 11) (l 12) (m 13) (n 14) (o 15) (p 16) (q 17) (r 18) (s 19) (t 20) (u 21) (v 22) (w 23) (x 24) (y 25) (z 26))
+              '(a + b - c * d / e + f - g * h / i + j - k * l / m + n - o * p / q + r - s * t / u + v - w * x / y + z))
+             '(1 + 2 - 3 * 4 / 5 + 6 - 7 * 8 / 9 + 10 - 11 * 12 / 13 + 14 - 15 * 16 / 17 + 18 - 19 * 20 / 21 + 22 - 23 * 24 / 25 + 26))
+  (test-case "6.15"
+             (substitutevar
+              '((z 26) (y 25) (x 24) (w 23) (v 22) (u 21) (t 20) (s 19) (r 18) (q 17) (p 16)
+                (o 15) (n 14) (m 13) (l 12) (k 11) (j 10) (i 9) (h 8) (g 7) (f 6) (e 5) (d 4)
+                (c 3) (b 2) (a 1))
+              '(a + b - c * d / e + f - g * h / i + j - k * l / m + n - o * p / q + r - s * t / u + v - w * x / y + z))
+             '(1 + 2 - 3 * 4 / 5 + 6 - 7 * 8 / 9 + 10 - 11 * 12 / 13 + 14 - 15 * 16 / 17 + 18 - 19 * 20 / 21 + 22 - 23 * 24 / 25 + 26))
+  (test-case "6.16"
+             (substitutevar
+              '((z 26) (y 25) (x 24) (w 23) (v 22) (u 21) (t 20) (s 19) (r 18) (q 17) (p 16)
+                (o 15) (n 14) (m 13) (l 12) (k 11) (j 10) (i 9) (h 8) (g 7) (f 6) (e 5) (d 4)
+                (c 3) (b 2) (a 1))
+              '(a + a - a * a / a + a - a * a / a + a - a * a / a + a - a * a / a + a - a * a / a + a - a * a / a + a))
+             '(1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1 - 1 * 1 / 1 + 1))
+  (test-case "6.17"
+             (substitutevar
+              '((a 1) (b 2) (c 3) (d 4) (e 5) (f 6) (g 7) (h 8) (i 9) (j 10) (k 11) (l 12) (m 13) (n 14) (o 15) (p 16) (q 17) (r 18) (s 19) (t 20) (u 21) (v 22) (w 23) (x 24) (y 25) (z 26))
+              '(a + (b - (c * (d / (e + (f - (g * (h / (i + (j - (k * (l / (m + (n - (o * (p / (q + (r - (s * (t / (u + (v - (w * (x / (y + z))))))))))))))))))))))))))
+             '(1 + (2 - (3 * (4 / (5 + (6 - (7 * (8 / (9 + (10 - (11 * (12 / (13 + (14 - (15 * (16 / (17 + (18 - (19 * (20 / (21 + (22 - (23 * (24 / (25 + 26))))))))))))))))))))))))))
 
   ;; ; simplifyvar
   ;; (test-case "7.17"
