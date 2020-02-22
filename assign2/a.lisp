@@ -237,14 +237,55 @@
     )
   )
 
-(defun simplify (E)
-  (simplifyBinary (binarize E))
+;; given an infix expr E, evaluate E
+;; according to the rules of
+;; arithmetic
+(defun simplify (E) (simplifyBinary (binarize E)) )
+
+(defun getValue (bindings var)
+  (if (null bindings)
+    'ERROR  ; var does not exist in bindings
+    (if (eq (caar bindings) var)
+      (simplify (cadar bindings))
+      (getValue (cdr bindings) var)
+      )
+    )
   )
 
-;; TODO
-;; (defun substitutevar (Bindings E)
+(defun subVar (bindings E AC)
+  (if (null E)
+    AC
 
-;;   )
+    (cond
+
+      ; if car E is an operator or a value append it into AC
+      ( (or (is_op (car E)) (numberp (car E)) ) 
+        (subVar bindings (cdr E) (append AC (list (car E))))
+        )
+
+      ; recurse if car E is a list
+      ( (list (car E))  
+        (subVar 
+          bindings (cdr E) (append AC (list (subVar bindings (car E) nil))) ) 
+        )
+      
+      ; if car E is a variable
+      (t 
+        (subVar bindings (cdr E) (append AC (list (getValue bindings (car E)))))
+        )
+      
+      )
+
+    )
+  )
+
+;; Bindings = ( (x1 I1) (x2 I2) ... (xn In) )
+;; E is a varexpr
+;; 
+;; apply simplify to each Ik
+(defun substitutevar (Bindings E) 
+  (subVar Bindings E nil)
+  )
 
 ;; TODO
 ;; (defun simplifyVar (Bindings E)
@@ -269,7 +310,7 @@
 (defun main ()
 
   ;; (binarize '((0 + 0 * 0) * 0 * (0 + (0 * 0 * 0 * 0 * 0))))
-  (binarize '(0 + (0 + 0 * 0 * 0)))
+  ;; (binarize '(0 + (0 + 0 * 0 * 0)))
 
   ; simplifybinary
   ;; (test-case "3.19" (simplifybinary '(0 * 0)) 0)
@@ -606,11 +647,11 @@
              1)
 
   ;; ; substitutevar
-  ;; (test-case "6.11"
-  ;;            (substitutevar
-  ;;             '((a 1) (b 1) (c 1) (d 1) (e 1) (f 1) (g 1) (h 1) (i 1) (j 1) (k 1) (l 1) (m 1) (n 1) (o 1) (p 1) (q 1) (r 1) (s 1) (t 1) (u 1) (v 1) (w 1) (x 1) (y 1) (z 1))
-  ;;             '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
-  ;;            '(1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1))
+  (test-case "6.11"
+             (substitutevar
+              '((a 1) (b 1) (c 1) (d 1) (e 1) (f 1) (g 1) (h 1) (i 1) (j 1) (k 1) (l 1) (m 1) (n 1) (o 1) (p 1) (q 1) (r 1) (s 1) (t 1) (u 1) (v 1) (w 1) (x 1) (y 1) (z 1))
+              '(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+             '(1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1))
   ;; (test-case "6.12"
   ;;            (substitutevar
   ;;             '((a 2) (b 2) (c 2) (d 2) (e 2) (f 2) (g 2) (h 2) (i 2) (j 2) (k 2) (l 2) (m 2) (n 2) (o 2) (p 2) (q 2) (r 2) (s 2) (t 2) (u 2) (v 2) (w 2) (x 2) (y 2) (z 2))
