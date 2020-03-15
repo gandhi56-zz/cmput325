@@ -25,7 +25,28 @@ even(L, E) :-
   findall(X, (member(X, L2), is_even(X)), E).
 
 
+/*
+  a3member(-X, ++L) generates members of X without any repetition
+*/
 
+list2set([], []).
+list2set([E|Es], Set) :-
+  member(E, Es),
+  list2set(Es, Set).
+list2set([E|Es], [E|Set]) :-
+  maplist(dif(E), Es),
+  list2set(Es, Set).
+
+a3member(X, L) :-
+  list2set(L, L2),
+  member(X, L2).
+
+/*
+  one_step_synthesis(++P, ?L) is true if P is a product and
+  L is the list of all ingredients which are required for the
+  final step that produces P, in sorted order as the relevant
+  required facts in the database.
+*/
 
 
 
