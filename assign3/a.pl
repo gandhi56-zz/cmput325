@@ -92,6 +92,11 @@ one_step_synthesis(P, L) :-
 full_synthesis(P, [P], []) :-
   available(P).
 
+full_synthesis(P, [], [P]) :-
+  \+ available(P),
+  one_step_synthesis(P, I),
+  listLen(I, 0).
+
 % P is unavailable, recurse on
 % its ingredients I
 full_synthesis(P, A, M) :-
@@ -102,27 +107,22 @@ full_synthesis(P, A, M) :-
 % trivial case
 split([], [], []).
 
-% ingredient X is available
-split([X|IRest], [X|ARest], M) :-
-  available(X),
-  split(IRest, ARest, M).
-
 % ingredient X is unavailable and
 % it is atomic
-split([X|IRest], A, [X|MRest]) :-
-  \+available(X),
-  one_step_synthesis(X, I),
-  listLen(I, 0),
-  split(IRest, A, MRest).
+split([X|IRest], A, M) :-
+  full_synthesis(X, AHead, MHead),
+  split(IRest, ARest, MRest),
+  add2list(AHead, ARest, A),
+  add2list(MHead, MRest, M).
 
 % ingredient X is unavailable and
 % it is not atomic
-split([X|_], A, M) :-
-  \+available(X),
-  one_step_synthesis(X, I),
-  listLen(I, N),
-  N > 0,
-  split(I, A, M).
-
+%split([X|_], A, M) :-
+%  \+available(X),
+%  one_step_synthesis(X, I),
+%  listLen(I, N),
+%  N > 0,
+%  split(I, A, M).
+%
 
 
