@@ -1,0 +1,13 @@
+
+CMPUT 325 Assignment progress
+ completed 1, 2, 3, 4.1
+
+4.2 tests:
+(mini)    MgOH -- OK
+(medium)  sodium_bicarbonate -- two repeats in both A and M
+(medium)  water -- too many repeats in A
+(medium)  hydrochloric acid -- OK
+
+
+
+

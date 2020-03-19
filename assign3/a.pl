@@ -1,12 +1,30 @@
+
+/*
+* miscelleanous predicates
+*
+*/
+
+listLen([], 0).
+listLen([_|T], N) :- listLen(T, NRest), N is NRest + 1.
+
+
+
+/*
+  ===========================================
+  || 1 a3last                              ||
+  ===========================================
+*/
+
 a3last([X], X).
 a3last([_|Rest], Last) :- 
   a3last(Rest, Last).
 
-is_even(N) :- mod(N, 2) =:= 0.
-
 /*
-  unnest(A, B) is true iff B is A without any nesting of lists
+  ===========================================
+  || 2 is_even and even                    ||
+  ===========================================
 */
+is_even(N) :- mod(N, 2) =:= 0.
 xatom(A) :- atom(A).
 xatom(A) :- number(A).
 unnest([],[]).
@@ -14,79 +32,97 @@ unnest([A|L],[A|L1]) :-
      xatom(A), unnest(L,L1).
 unnest([A|L],R) :- 
      unnest(A,A1), unnest(L,L1), append(A1,L1,R).
-
-/*
-  even(L, E) is true iff E is an unnested list of L containing
-  only even elements
-*/
-
 even(L, E) :-
   unnest(L, L2),
   findall(X, (member(X, L2), is_even(X)), E).
 
 
 /*
-  a3member(-X, ++L) generates members of X without any repetition
+  ===========================================
+  || 3 a3member                            ||
+  ===========================================
 */
 
-/*
-list2set([], []).
-list2set([E|Es], Set) :-
-  member(E, Es),
-  list2set(Es, Set).
 
-list2set([E|Es], [E|Set]) :-
-  maplist(dif(E), Es),
-  list2set(Es, Set).
-
-a3member(X, L) :-
-  list2set(L, L2),
-  member(X, L2).
-*/
+amember(X, [X|_]).
+amember(X, [_|L]) :-
+  amember(X, L).
 
 not_member(_, []).
 not_member(X, [Y|L]) :-
   X \== Y,
   not_member(X, L).
 
-nocopies([], []).
-nocopies([L|Rest], S) :-
-  member(L, Rest),
-  nocopies(Rest, S).
+add2list([], L, L).
+add2list([A|L1], L2, [A|L3]) :-
+  add2list(L1, L2, L3).
 
-nocopies([L|Rest], [L|S]) :-
-  not_member(L, Rest),
-  nocopies(Rest, S).
+rev([], []).
+rev([H|T], R) :-
+  rev(T, S),
+  add2list(S, [H], R).
+
+nocopy(X, [_|L]) :-
+  nocopy(X, L).
+nocopy(X, [X|L]) :-
+  not_member(X, L).
 
 a3member(X, L) :-
-  nocopies(L, S),
-  member(X, S).
+  rev(L, Rev),
+  nocopy(X, Rev).
+
 
 /*
-  one_step_synthesis(++P, ?L) is true if P is a product and
-  L is the list of all ingredients which are required for the
-  final step that produces P, in sorted order as the relevant
-  required facts in the database.
+  ===========================================
+  || 4.1 one_step_synthesis                ||
+  ===========================================
 */
 
 one_step_synthesis(P, L) :-
-  findall(X, required(X, P), L).
+  findall(X, required(X, P), Res),
+  list_to_set(Res, L).
 
 /*
-  full_synthesis(++P, ?A, ?M)
-  given
-    P = product
-    A = list of all available ingredients that is required at any step in the synthesis of P
-    M = list of missing ingredients that are required but not available
-  Elements in A and M could be directly or indirectly required
+  ===========================================
+  || 4.2 full_synthesis                    ||
+  ===========================================
 */
 
+% P is available
+full_synthesis(P, [P], []) :-
+  available(P).
+
+% P is unavailable, recurse on
+% its ingredients I
 full_synthesis(P, A, M) :-
-  one_step_synthesis(P, I).
+  \+ available(P),
+  one_step_synthesis(P, I),
+  split(I, A, M).
 
+% trivial case
+split([], [], []).
 
+% ingredient X is available
+split([X|IRest], [X|ARest], M) :-
+  available(X),
+  split(IRest, ARest, M).
 
+% ingredient X is unavailable and
+% it is atomic
+split([X|IRest], A, [X|MRest]) :-
+  \+available(X),
+  one_step_synthesis(X, I),
+  listLen(I, 0),
+  split(IRest, A, MRest).
 
+% ingredient X is unavailable and
+% it is not atomic
+split([X|_], A, M) :-
+  \+available(X),
+  one_step_synthesis(X, I),
+  listLen(I, N),
+  N > 0,
+  split(I, A, M).
 
 
 

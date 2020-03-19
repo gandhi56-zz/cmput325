@@ -17,10 +17,13 @@ rev([H|T], R) :-
   rev(T, S),
   add2list(S, [H], R).
 
-nocopy(X, [X|L]) :-
-  not_member(X, L).
 nocopy(X, [_|L]) :-
   nocopy(X, L).
+nocopy(X, [X|L]) :-
+  not_member(X, L).
 
 a3member(X, L) :-
-  nocopy(X, S).
+  nocopy(X, L).
+
+
+
