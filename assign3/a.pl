@@ -115,14 +115,13 @@ split([X|IRest], A, M) :-
   add2list(AHead, ARest, A),
   add2list(MHead, MRest, M).
 
-% ingredient X is unavailable and
-% it is not atomic
-%split([X|_], A, M) :-
-%  \+available(X),
-%  one_step_synthesis(X, I),
-%  listLen(I, N),
-%  N > 0,
-%  split(I, A, M).
-%
+/*
+  ===========================================
+  || 4.3 in_cycle(++S, -Cycle)             ||
+  ===========================================
+*/
 
+in_cycle(S, [S|Path]) :-    required(S, A), path(A, S, Path).
+path(A, B, [A, B]) :-       required(A, B).
+path(A, Z, [A|Rest]) :-     required(A, X), path(X, Z, Rest).
 
