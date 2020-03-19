@@ -102,6 +102,8 @@ full_synthesis(P, [], [P]) :-
 full_synthesis(P, A, M) :-
   \+ available(P),
   one_step_synthesis(P, I),
+  listLen(I, N),
+  N > 0,
   split(I, A, M).
 
 % trivial case
