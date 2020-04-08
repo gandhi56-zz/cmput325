@@ -18,7 +18,8 @@ my_all_different([]).
 my_all_different([A|L]) :-  \+ member(A,L), my_all_different(L).
 
 schedule(M) :- length(M, 10), ok(0, M, 1). 
-schedule_saturday_night(M) :- length(0, M, 10), ok(M, 1).
+schedule_saturday_night(M) :- length(M, 10), ok(1, M, 1).
+schedule_sunday_night(M) :- length(M, 10), ok(2, M, 1).
 
 % game 1
 ok(K, [(X, Y)|Rest], 1) :- game(X, Y), X \= regina, Y \= regina,
@@ -37,8 +38,8 @@ ok(K, [(X, Y)|Rest], 4, (L, R)) :- game(X, Y), my_all_different([X, Y, L, R]),
   ok(K, Rest, 5, (X, Y)), \+ member((X, Y), Rest).
 
 % game 5
-ok(0, [(X, Y)|Rest], 5, (L, R)) :- game(X, Y), my_allKdifferent([X, Y, L, R]),
-  ok(0, Rest, 6, (X, Y)), \+ member((X, Y), Rest).
+ok(K, [(X, Y)|Rest], 5, (L, R)) :- game(X, Y), my_all_different([X, Y, L, R]),
+  ok(K, Rest, 6, (X, Y)), \+ member((X, Y), Rest), member(K, [0,2]).
 ok(1, [(X, Y)|Rest], 5, (L, R)) :- X = calgary, Y = edmonton, 
   my_all_different([X, Y, L, R]),
   ok(1, Rest, 6, (X, Y)), \+ member((X, Y), Rest).
@@ -61,8 +62,10 @@ ok(K, [(X, Y)|Rest], 9, (L, R)) :- game(X, Y), X \= saskatoon, Y \= saskatoon,
   ok(K, Rest, 10, (X, Y)), \+ member((X, Y), Rest).
 
 % game 10
-ok(_, [(X, Y)], 10, (L, R)) :- game(X, Y), X \= saskatoon, Y \= saskatoon, 
-  my_all_different([X, Y, L, R]).
+ok(K, [(X, Y)], 10, (L, R)) :- game(X, Y), X \= saskatoon, Y \= saskatoon, 
+  my_all_different([X, Y, L, R]), member(K, [0,1]).
+
+ok(2, [(X, Y)], 10, (L, R)) :- X = calgary, Y = edmonton, my_all_different([X, Y, L, R]).
 
 
 
