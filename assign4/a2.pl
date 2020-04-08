@@ -1,16 +1,14 @@
-is_team(X) :- member(X, [calgary, edmonton, regina, saskatoon, vancouver]).
-are_teams(X, Y) :- is_team(X), is_team(Y), alph(X, Y).
 
-alph(calgary, edmonton).
-alph(calgary, regina).
-alph(calgary, saskatoon).
-alph(calgary, vancouver).
-alph(edmonton, regina).
-alph(edmonton, saskatoon).
-alph(edmonton, vancouver).
-alph(regina, saskatoon).
-alph(regina, vancouver).
-alph(saskatoon, vancouver).
+game(calgary, edmonton).
+game(calgary, regina).
+game(calgary, saskatoon).
+game(calgary, vancouver).
+game(edmonton, regina).
+game(edmonton, saskatoon).
+game(edmonton, vancouver).
+game(regina, saskatoon).
+game(regina, vancouver).
+game(saskatoon, vancouver).
 
 count(_, [], 0).
 count(X, [X|Rest], N) :- count(X, Rest, NRest), N is NRest + 1.
@@ -19,55 +17,52 @@ count(X, [Y|Rest], N) :- \+ X = Y, count(X, Rest, N).
 my_all_different([]).
 my_all_different([A|L]) :-  \+ member(A,L), my_all_different(L).
 
-schedule(M) :-  length(M, 10), ok(M, 1). 
-%count((calgary, edmonton), M, 1),
-% count((calgary, regina), M, 1),
-% count((calgary, saskatoon), M, 1),
-% count((calgary, vancouver), M, 1),
-% count((edmonton, regina), M, 1),
-%  count((edmonton, saskatoon), M, 1),
-%  count((edmonton, vancouver), M, 1),
-%  count((regina, saskatoon), M, 1),
-%  count((regina, vancouver), M, 1),
-%  count((saskatoon, vancouver), M, 1).
+schedule(M) :- length(M, 10), ok(0, M, 1). 
+schedule_saturday_night(M) :- length(0, M, 10), ok(M, 1).
 
 % game 1
-ok([(X, Y)|Rest], 1) :- are_teams(X, Y) , my_all_different([X, Y, regina]),
-  ok(Rest, 2, (X, Y)).
+ok(K, [(X, Y)|Rest], 1) :- game(X, Y), X \= regina, Y \= regina,
+  ok(K, Rest, 2, (X, Y)), \+ member((X, Y), Rest).
 
 % game 2
-ok([(X, Y)|Rest], 2, (L, R)) :- are_teams(X, Y) , my_all_different([X, Y, L, R, regina]),
-  ok(Rest, 3, (X, Y)).
+ok(K, [(X, Y)|Rest], 2, (L, R)) :- game(X, Y), X \= regina, Y \= regina,
+  my_all_different([X, Y, L, R]), ok(K, Rest, 3, (X, Y)), \+ member((X, Y), Rest).
 
 % game 3
-ok([(X, Y)|Rest], 3, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R]),
-  ok(Rest, 4, (X, Y)).
+ok(K, [(X, Y)|Rest], 3, (L, R)) :- game(X, Y), my_all_different([X, Y, L, R]),
+  ok(K, Rest, 4, (X, Y)), \+ member((X, Y), Rest).
 
 % game 4
-ok([(X, Y)|Rest], 4, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R]),
-  ok(Rest, 5, (X, Y)).
+ok(K, [(X, Y)|Rest], 4, (L, R)) :- game(X, Y), my_all_different([X, Y, L, R]),
+  ok(K, Rest, 5, (X, Y)), \+ member((X, Y), Rest).
 
 % game 5
-ok([(X, Y)|Rest], 5, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R]),
-  ok(Rest, 6, (X, Y)).
+ok(0, [(X, Y)|Rest], 5, (L, R)) :- game(X, Y), my_allKdifferent([X, Y, L, R]),
+  ok(0, Rest, 6, (X, Y)), \+ member((X, Y), Rest).
+ok(1, [(X, Y)|Rest], 5, (L, R)) :- X = calgary, Y = edmonton, 
+  my_all_different([X, Y, L, R]),
+  ok(1, Rest, 6, (X, Y)), \+ member((X, Y), Rest).
 
 % game 6
-ok([(X, Y)|Rest], 6, _) :- are_teams(X, Y), my_all_different([X, Y]),
-  ok(Rest, 7, (X, Y)).
+ok(K, [(X, Y)|Rest], 6, _) :- game(X, Y), my_all_different([X, Y]),
+  ok(K, Rest, 7, (X, Y)), \+ member((X, Y), Rest).
 
 % game 7
-ok([(X, Y)|Rest], 7, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R]),
-  ok(Rest, 8, (X, Y)).
+ok(K, [(X, Y)|Rest], 7, (L, R)) :- game(X, Y), my_all_different([X, Y, L, R]),
+  ok(K, Rest, 8, (X, Y)), \+ member((X, Y), Rest).
 
 % game 8
-ok([(X, Y)|Rest], 8, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R]),
-  ok(Rest, 9, (X, Y)).
+ok(K, [(X, Y)|Rest], 8, (L, R)) :- game(X, Y), my_all_different([X, Y, L, R]),
+  ok(K, Rest, 9, (X, Y)), \+ member((X, Y), Rest).
 
 % game 9
-ok([(X, Y)|Rest], 9, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R, saskatoon]),
-  ok(Rest, 10, (X, Y)).
+ok(K, [(X, Y)|Rest], 9, (L, R)) :- game(X, Y), X \= saskatoon, Y \= saskatoon,
+  my_all_different([X, Y, L, R]),
+  ok(K, Rest, 10, (X, Y)), \+ member((X, Y), Rest).
 
-ok([(X, Y)], 10, (L, R)) :- are_teams(X, Y), my_all_different([X, Y, L, R, saskatoon]).
+% game 10
+ok(_, [(X, Y)], 10, (L, R)) :- game(X, Y), X \= saskatoon, Y \= saskatoon, 
+  my_all_different([X, Y, L, R]).
 
 
 
